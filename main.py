@@ -1,28 +1,33 @@
+from colors import Colors
 import pygame
-import sys
-from grid import Grid
-from blocks import *
+from position import Position
 
-pygame.init()
-dark_blue = (44,44,127)
+class Block:
+    def __init__(self, id):
+        self.id = id
+        self.cells = {}
+        self.cell_size = 30
+        self.row_offset = 0
+        self.column_offset = 0
+        self.rotation_state = 0
+        self.colors = Colors.get_cell_colors()
 
-screen =pygame.display.set_mode((300,600))
-pygame.display.set_caption("Python Tetris")
+    def move(self, rows, columns):
+        self.row_offset += rows
+        self.columns_offset += columns
 
-clock = pygame.time.Clock()
+    def get_cell_posistions(self):
+        tiles = self.cells[self.rotation_state]
+        moved_tiles = []
+        for position in tiles:
+            position = Position(position.row + self.row_offset, position.column + self.column_offset)
+            moved_tiles.append(position)
+        return moved_tiles
 
-game_grid = Grid()
+    def draw(self,screen):
+        tiles = self.get_celss_positions()
+        for tile in tiles:
+            tile_rect= pygame.Rect(tile.column*self.cell_size+1,tile.row*self.cell_size*1,self.cell_size-1,self.cell_size-1)
+            pygame.draw.rect(screen,self.colors[self.id],tile_rect)
 
-block = LBlock()
 
-while True:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-    screen.fill(dark_blue)
-    game_grid.draw(screen)
-    block.draw(screen)
-
-    pygame.display.update()
-    clock.tick(60)
