@@ -1,8 +1,19 @@
 import pygame
-import sys
 from integration import *
 from game import Game
 from colors import Colors
+
+import os, sys
+from fcntl import ioctl
+
+# ioctl commands defined at the pci driver
+RD_SWITCHES   = 24929
+RD_PBUTTONS   = 24930
+WR_L_DISPLAY  = 24931
+WR_R_DISPLAY  = 24932
+WR_RED_LEDS   = 24933
+WR_GREEN_LEDS = 24934
+
 
 pygame.init()
 title_font = pygame.font.Font(None, 40)
@@ -21,22 +32,39 @@ clock = pygame.time.Clock()
 game = Game()
 
 Integration=IO()
+flag=0
+flag2=1
+numero = "0000"
 
 GAME_UPDATE = pygame.USEREVENT 
 pygame.time.set_timer(GAME_UPDATE, 300)
 
 while True:
     for event in pygame.event.get():
+	
         if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-        
-        if Integration.get_SW(0)==1:
+        if game.game_over == True and Integration.get_SW(0) == 1 and flag==0:
+                game.game_over = False
+                game.reset()
+                flag=1
+        if Integration.get_SW(0) == 0:
+        		flag=0
+        if Integration.get_PB(2)==0 and game.game_over == False:
             game.move_left()
-        if Integration.get_SW(1)==1:
+        if Integration.get_PB(0)==0 and game.game_over == False:
             game.move_right()
-        if Integration.get_SW(2)==1:
+        if Integration.get_PB(3)==0 and game.game_over == False:
+            game.rotate()
+        if Integration.get_PB(1)==0 and game.game_over == False:
             game.move_down()
+            game.update_score(0, 1)
+        numero=str(game.score)
+        if game.score >= 0:
+        	numero=numero.zfill(4)
+        Integration.put_DP(0,numero)
+        
 
         if event.type == pygame.KEYDOWN:
             if game.game_over == True and event.key == pygame.K_k:
