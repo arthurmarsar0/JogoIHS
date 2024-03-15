@@ -20,6 +20,8 @@ clock = pygame.time.Clock()
 
 game = Game()
 
+Integration=IO()
+
 GAME_UPDATE = pygame.USEREVENT 
 pygame.time.set_timer(GAME_UPDATE, 300)
 
@@ -29,11 +31,11 @@ while True:
                 pygame.quit()
                 sys.exit()
         
-        if IO.get_SW(0)==1:
+        if Integration.get_SW(0)==1:
             game.move_left()
-        if IO.get_SW(1)==1:
+        if Integration.get_SW(1)==1:
             game.move_right()
-        if IO.get_SW(2)==1:
+        if Integration.get_SW(2)==1:
             game.move_down()
 
         if event.type == pygame.KEYDOWN:
